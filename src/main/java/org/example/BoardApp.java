@@ -61,9 +61,6 @@ public class BoardApp {
                 System.out.print("새로운 내용을 입력해주세요 : ");
                 String newBody = scan.nextLine();
 
-                // 변하지 않는 것에서 변하는 것을 분리
-                // 변하는 것에서 변하지 않는 것을 분리
-//                int index = findIndexById(inputId);
                 Article target = articleList.get(index);
                 target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
                 target.setBody(newBody);
@@ -102,27 +99,41 @@ public class BoardApp {
                 System.out.println("===================");
 
             } else if (cmd.equals("list2")) {
-
                 // 테스트 데이터
                 articleList.add(new Article(1, "안녕하세요 반갑습니다. 자바 공부중이에요.", ""));
                 articleList.add(new Article(2, "자바 질문좀 할게요~", ""));
                 articleList.add(new Article(3, "정처기 따야되나요?", ""));
                 System.out.println("===================");
-
                 for (Article article : articleList) {
                     System.out.println("번호 : " + article.getId());
                     System.out.printf("제목 : %s\n", article.getTitle());
                     System.out.println("===================");
                 }
+            } else if (cmd.equals("search")) {
+                System.out.print("검색 키워드를 입력 해주세요 : ");
+                String keyword = scan.nextLine();
+                boolean found = false; // 검색 결과가 있는지 여부를 나타내는 변수
+
+                // articleList를 순회하며 검색 키워드가 제목에 포함된 게시물을 출력
+                for (Article article : articleList) {
+                    if (article.getTitle().contains(keyword)) {
+                        // 검색 결과가 있으면 출력
+                        System.out.println("번호 : " + article.getId());
+                        System.out.printf("제목 : %s\n", article.getTitle());
+                        System.out.println("===================");
+                        found = true;
+                    }
+                }
+                // 검색 결과가 없을 경우 안내 메시지 출력
+                if (!found) {
+                    System.out.println("===================");
+                    System.out.println("검색 결과가 없습니다.");
+                    System.out.println("===================");
+                }
             }
         }
     }
-
-    // 입력 : 찾고자 하는 게시물 번호
-// 출력 : 게시물 번호에 해당하는 인덱스
     public int findIndexById(int id) {
-//        int index = -1; // 최종적으로 찾은 목적 인덱스를 저장하기 위함. index는 0 ~ n까지 표현 가능하므로 인덱스로 사용이 불가능한 -1로 설정
-
         for (int i = 0; i < articleList.size(); i++) {
             Article article = articleList.get(i);
             if (article.getId() == id) {

@@ -3,8 +3,8 @@ package org.example;
 public class Article {
     private int id; // 번호
     private String title; // 제목
-
     private String body; // 내용
+//    private String keyword;
 
     public Article(int id, String title, String body) {
         this.id = id;
