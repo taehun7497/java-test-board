@@ -14,6 +14,7 @@ public class BoardApp {
     Map<String, String> nicknames = new HashMap<>();
     String loggedInId = null;
     int latestArticleId = 4; // 테스트 데이터 3개 있으므로 시작 번호를 4로 지정
+    int WRONG_VALUE = -1; // 값의 의미를 부여
 
     public void run() {
         makeTestData();
@@ -24,22 +25,16 @@ public class BoardApp {
             if (cmd.equals("exit")) { // 숫자가 아닌 경우 같다라는 표현을 할 때 == 이 아닌 .equals()를 사용해야 한다.
                 System.out.println("프로그램을 종료합니다.");
                 break; // 반복문 탈출
-            } else if (cmd.equals("add")) {
-                add();
-            } else if (cmd.equals("list")) {
-                list();
-            } else if (cmd.equals("update")) {
-                update();
-            } else if (cmd.equals("delete")) {
-                delete();
-            } else if (cmd.equals("detail")) {
-                detail();
-            } else if (cmd.equals("search")) {
-                search();
-            } else if (cmd.equals("signup")) {
-                signup();
-            } else if (cmd.equals("login")) {
-                login();
+            } switch (cmd) {
+                case "add" -> add();
+                case "list" -> list();
+                case "update" -> update();
+                case "delete" -> delete();
+                case "detail" -> detail();
+                case "search" -> search();
+                case "signup" -> signup();
+                case "login" -> login();
+                default -> System.out.println("올바른 명령어가 아닙니다.");
             }
         }
     }
@@ -94,13 +89,19 @@ public class BoardApp {
 
     private void detail() {
         System.out.print("상세보기 할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
-        int index = findIndexById(inputId);
-        if (index == -1) {
+
+        int inputId = getParamAsInt(scan.nextLine(), WRONG_VALUE);
+        if(inputId == WRONG_VALUE) {
+            return;
+        }
+
+        Article article = findArticleById(inputId);
+
+        if (article == null) {
             System.out.println("없는 게시물입니다.");
             return;
         }
-        Article article = articleList.get(index);
+        article.increaseHit();
         // 조회수 증가 v2
         article.increaseHit(); // 각 객체들이 알아서 조회수를 증가시킴. 관련 로직은 한 곳에 집중시켜서 관리를 편하게 함
         System.out.printf("======%d번 게시물======\n", article.getId());
@@ -145,20 +146,30 @@ public class BoardApp {
     }
     private void delete() {
         System.out.print("삭제할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
-        int index = findIndexById(inputId);
-        if (index == -1) {
+
+        int inputId = getParamAsInt(scan.nextLine(), WRONG_VALUE);
+        if(inputId == WRONG_VALUE) {
+            return;
+        }
+
+        Article article = findArticleById(inputId);
+        if (article == null) {
             System.out.println("없는 게시물입니다.");
             return;
         }
-        articleList.remove(index);
+        articleList.remove(article); // arrayList remove는 값을 직접 찾아서 지워주기도 함
         System.out.printf("%d 게시물이 삭제되었습니다.\n", inputId);
     }
     private void update() {
         System.out.print("수정할 게시물 번호를 입력해주세요 : ");
-        int inputId = Integer.parseInt(scan.nextLine());
-        int index = findIndexById(inputId);
-        if (index == -1) {
+
+        int inputId = getParamAsInt(scan.nextLine(), WRONG_VALUE);
+        if(inputId == WRONG_VALUE) {
+            return;
+        }
+
+        Article article = findArticleById(inputId);
+        if (article == null) {
             System.out.println("없는 게시물입니다.");
             return;
         }
@@ -166,11 +177,8 @@ public class BoardApp {
         String newTitle = scan.nextLine();
         System.out.print("새로운 내용을 입력해주세요 : ");
         String newBody = scan.nextLine();
-        // 변하지 않는 것에서 변하는 것을 분리
-        // 변하는 것에서 변하지 않는 것을 분리
-        Article target = articleList.get(index);
-        target.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
-        target.setBody(newBody);
+        article.setTitle(newTitle); // target은 참조값이므로 직접 객체를 접근하여 수정 가능
+        article.setBody(newBody);
         System.out.printf("%d번 게시물이 수정되었습니다.\n", inputId);
     }
     private void list() {
@@ -204,14 +212,15 @@ public class BoardApp {
             System.out.println("===================");
         }
     }
-    public int findIndexById(int id) {
+    public Article findArticleById(int id) {
         for (int i = 0; i < articleList.size(); i++) {
             Article article = articleList.get(i);
+
             if (article.getId() == id) {
-                return i; // 원하는 것은 찾은 즉시 종료.
+                return article; // 원하는 것은 찾은 즉시 종료.
             }
         }
-        return -1;
+        return null; // 객체타입에서만 사용 가능
     }
     public String getCurrentDateTime() {
         LocalDateTime now = LocalDateTime.now();
@@ -220,5 +229,14 @@ public class BoardApp {
         // 지정한 형식으로 날짜와 시간을 출력합니다.
         String formattedDate = now.format(formatter);
         return formattedDate;
+    }
+
+    private int getParamAsInt(String param, int defaultValue) {
+        try {
+            return Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            System.out.println("숫자를 입력해주세요.");
+            return defaultValue;
+        }
     }
 }
