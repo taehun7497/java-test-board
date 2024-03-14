@@ -1,4 +1,6 @@
-package org.example;
+package org.example.domain;
+
+import java.time.LocalDateTime;
 
 public class Article {
     private int id; // 번호
@@ -6,8 +8,8 @@ public class Article {
     private String body; // 내용
     private int hit; // 조회수
     private String regDate; // 등록날짜
-//    private String ID; // ID
-
+    public Article() {
+    }
     public Article(int id, String title, String body, int hit, String regDate) {
         this.id = id;
         this.title = title;
@@ -24,33 +26,27 @@ public class Article {
     public void setHit(int hit) {
         this.hit = hit;
     }
-    public String getRegDate(){
+    public String getRegDate() {
         return regDate;
     }
-
-    public void setRegDate(String regDate){
+    public void setRegDate(String regDate) {
         this.regDate = regDate;
     }
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
-
     public String getBody() {
         return body;
     }
-
     public void setBody(String body) {
         this.body = body;
     }
